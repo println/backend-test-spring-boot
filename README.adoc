@@ -268,16 +268,16 @@ Essas notificações vão em pacotes chamados `Message`, com a operação e o dado do
 [source,json,indent=0]
 ----
 {
-    "operation": "POST",
-    "data": {
+	"operation": "POST",
+	"data": {
 		"uuid": "5cdecd30-f273-439c-9638-923318fb91c5",
-        "dueDate": "2020-09-22",
-        "value": "605.00",
-        "debtors": [        
-            { "name": "Fulano", "email": "fulano@web.net", "cellNumber": "21123451234" },
-            { "name": "Ciclano", "email": "ciclano@web.com" , "cellNumber": "11123451234" }
-        ]
-    }
+		"dueDate": "2020-09-22",
+		"value": "605.00",
+		"debtors": [        
+			{ "name": "Fulano", "email": "fulano@web.net", "cellNumber": "21123451234" },
+			{ "name": "Ciclano", "email": "ciclano@web.com" , "cellNumber": "11123451234" }
+		]
+	}
 }
 ----
 
