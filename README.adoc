@@ -261,9 +261,9 @@ CAUTION: É possível remover apenas devedores sem dívidas
 
 ==== Dados via AMQP
 
-Existem algumas notificações lançadas pelo Debts para a fila `debt.collector` do RabbitMQ quando algumas operações são realizadas via Web.
+Existem 3 tipos notificações lançadas pelo Debts para a fila `debt.collector` do RabbitMQ quando algumas operações são realizadas via Web.
 
-Essas notificações são pacotes chamados Message com um campo para a operação e outro campo com débito em si:
+Essas notificações vão em pacotes chamados `Message`, com a operação e o dado do débito:
 
 [source,json,indent=0]
 ----
