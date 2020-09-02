@@ -82,11 +82,13 @@ Todas as rotas estão disponíveis via Swagger, em:
 
 O Debts Service é o serviço onde as dívidas são manipuladas. O serviço é construído com banco relacional, SQL, e está funcionando com um h2 em memória.
 
+NOTE: O H2 foi escolhido apenas para a avaliação do teste ser mais fácil, sendo possível utilizar um PostgreSQL em produção
+
 É possível incluir, consultar, pagar e remover dívidas. Quando uma dívidas é inserida, é lançanado uma notificação de cobrança.
 
 IMPORTANT: As notificações são enviadas para o RabbitMQ, fila `debt.collector`
 
-==== Carga de dados
+==== Dados via Web
 
 Para desenvolver os serviços foram utilizados os seguintes para criar `debtors` e os `debts`.
 
@@ -257,14 +259,80 @@ CAUTION: É possível remover apenas devedores sem dívidas
 	DELETE /api/debtors/{debtorId} HTTP/1.1
 ----
 
+==== Dados via AMQP
 
+Existem algumas notificações lançadas pelo Debts para a fila `debt.collector` do RabbitMQ quando algumas operações são realizadas via Web.
+
+Essas notificações são pacotes chamados Message com um campo para a operação e outro campo com débito em si:
+
+[source,json,indent=0]
+----
+{
+    "operation": "POST",
+    "data": {
+        "dueDate": "2020-09-22",
+        "value": "605.00",
+        "debtors": [        
+            { "name": "Fulano", "email": "fulano@web.net", "cellNumber": "21123451234" },
+            { "name": "Ciclano", "email": "ciclano@web.com" , "cellNumber": "11123451234" }
+        ]
+    }
+}
+----
+
+As operações contém os seguintes estados:
+
+* `POST` - Novo débito
+* `PUT`  - Débito atualizado
+* `DELETE` - Débito removido ou pago
+
+===== *1 - Criando um `debt`*
+Incluindo dívida:
+
+[source,json,indent=0]
+----
+{
+    "operation": "POST",
+    "data": {...}
+}
+----
+
+'''
+===== *2 - Editando um `debt`*
+Pagando um dívida:
+
+[source,json,indent=0]
+----
+{
+    "operation": "PUT",
+    "data": {...}
+}
+----
+
+'''
+===== *2 - Deletando um `debt`*
+Removendo um dívida:
+
+[source,json,indent=0]
+----
+{
+    "operation": "DELETE",
+    "data": {...}
+}
+----
 
 === Serviço para cobranças (Debts-Collector Service)
 
 O Debts-Collector é o serviço de cobrança que atua enviando mensagens aos respectivos devedores, com finalidade de lembrar as datas de pegamento.
 
-Do ponto de vista técnico, o serviço Debts-Collector recebe notificações de cobrança lançadas pelo Debts, via RabbitMQ, faz o armazenamento no MongoDB.
+Do ponto de vista técnico, o serviço Debts-Collector recebe notificações de cobrança lançadas pelo Debts, via RabbitMQ, e faz o armazenamento no MongoDB.
+
+NOTE: O MongoDB está rodando embarcado apenas para a avaliação do teste ser mais fácil
 
 NOTE: As notificações são recebidas da fila `debt.collector`
 
-Nas datas de 10 dias e 1 dia  antes da data de vencimento, é disparado o envio dos lembretes de pagamentos por `sms`, `email`, `telefonemas` ou `whatsapp`.
+As mensagens são lançadas nas datas de 10 dias antes e 1 dia antes da data de vencimento e podem serem enviadas por: `sms`, `email`, `telefonemas` ou `whatsapp`.
+
+==== Dados via AMQP
+
+==== Dados via WEB
