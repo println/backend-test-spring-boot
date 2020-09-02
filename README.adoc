@@ -1,0 +1,154 @@
+= Teste para Backend: Spring-Boot 
+
+O teste contém 2 módulos construídos com Spring Boot, se comunicando via troca de mensagens pelo RabbitMQ.
+
+==== Aspectos gerais:
+
+* API REST
+* Testes de todos os `resources`, validações dos dados e respostas
+* Banco de dados embarcado para não precisar instalar
+* Contém pedaços de outros projetos na parte de `support`
+
+==== Tecnologias:
+
+* Jpa + Specifications
+* Spring-Data
+* Spring-Actuator
+* Junit jupiter
+* AssertJ
+* Mockito
+* Swagger
+* Problem (org.zalando)
+* Amqp + RabbitMQ
+* SQL(h2)
+* NOSQL(Mongo)
+
+
+== Instalação e excução
+Guia rápido para instalação dos componentes e dependências para a execução do teste.
+
+==== Instalar o RabbitMQ via Docker
+
+Executar o comando para instalar e executar o RabbitMQ:
+
+[indent=0]
+----
+	$ ./docker run -d -p 5672:5672 -p 15672:15672 --name=rabbitmq rabbitmq:3.8.3-management
+----
+
+Apesar de o comando informar versão `3.8.3`, acredito que a `3.8.7` funcione, porém, não testei.
+
+==== Instalar o Spring-Boot com Maven
+
+Baixar o projeto do repositório ou clonar via git.
+Em seguida, executar o maven nas pastas `debt` e `debtcollector` para baixar as dependências.
+
+
+[indent=0]
+----
+	$ ./mvn clean install
+----
+
+
+Após baixar as dependências o projeto está pronto para execução. Entre nas pastas `debt` e `debtcollector` execute o comando:
+
+
+[indent=0]
+----
+	$ ./mvn spring-boot:run
+----
+
+
+Caso queria passar um ip diferente de `localhost` para a conexão com o RabbitMQ, usar o comando:
+
+
+[indent=0]
+----
+	$ ./mvn spring-boot:run -Dspring-boot.run.arguments="--spring.rabbitmq.host={ip}"
+----
+
+
+== Interagindo com os serviços
+
+Todas as rotas estão disponíveis via Swagger, em:
+
+* Debts Service: http://localhost:8080/swagger-ui.html
+* Debt-Collector Service: http://localhost:8081/swagger-ui.html
+
+=== Dados
+
+Para desenvolver os serviços foram utilizados os seguintes para criar `debtors` e os `debts`.
+
+Para incluir o `debt` é necessário ter um `debtor` cadastrado.
+
+
+==== Criando os `debtors`
+
+Incluindo Fulano:
+
+[source,http,indent=0]
+----
+	POST /api/debtors HTTP/1.1
+	Host: localhost:8080
+	Content-Type: application/json
+
+	{
+		"cpf": "82699703010",
+		"name": "Fulano",
+		"email": "fulano@web.net",
+		"cellNumber": "21123451234"
+	}
+----
+
+Incluindo Ciclano:
+
+[source,http,indent=0]
+----
+	POST /api/debtors HTTP/1.1
+	Host: localhost:8080
+	Content-Type: application/json
+
+	{
+		"cpf": "64576239058",
+		"name": "Ciclano",
+		"cellNumber": "11123451234",
+		"email": "ciclano@web.com"
+	}
+----
+
+==== Criando os `debts`
+
+Incluindo dívida para Ciclano:
+
+[source,http,indent=0]
+----
+	POST /api/debts HTTP/1.1
+	Host: localhost:8080
+	Content-Type: application/json
+
+	{
+		"dueDate": "2020-09-24",
+		"value": "500.00",
+		"cpfs": [
+			"64576239058"
+		]
+	}
+----
+
+Incluindo dívida para Fulano e Ciclano:
+
+[source,http,indent=0]
+----
+	POST /api/debts HTTP/1.1
+	Host: localhost:8080
+	Content-Type: application/json
+
+	{
+		"dueDate": "2020-09-22",
+		"value": "605.00",
+		"cpfs": [        
+			"64576239058",
+			"82699703010"
+		]
+	}
+----
