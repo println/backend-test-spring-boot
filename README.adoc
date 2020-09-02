@@ -308,7 +308,7 @@ As operações contém os seguintes estados:
 ----
 
 '''
-===== *3 - Ao Deletar ou pagar um `debt`*
+===== *3 - Ao deletar ou pagar um `debt`*
 
 [source,json,indent=0]
 ----
