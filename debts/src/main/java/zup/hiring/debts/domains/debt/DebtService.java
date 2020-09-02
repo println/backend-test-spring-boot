@@ -1,12 +1,10 @@
 package zup.hiring.debts.domains.debt;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import zup.hiring.debts.domains.debt.collector.amqp.CollectorService;
 import zup.hiring.debts.domains.debt.web.DebtRequestFilter;
@@ -14,7 +12,6 @@ import zup.hiring.debts.domains.debtor.Debtor;
 import zup.hiring.debts.domains.debtor.DebtorService;
 import zup.hiring.debts.support.web.rest.errors.BadRequestAlertException;
 
-import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
@@ -28,16 +25,13 @@ public class DebtService {
     private final DebtRepository repository;
     private final DebtorService debtorService;
     private final CollectorService collectorService;
-    private final EntityManager em;
 
     public DebtService(DebtRepository repository,
                        DebtorService debtorService,
-                       CollectorService collectorService,
-                       EntityManager em) {
+                       CollectorService collectorService) {
         this.repository = repository;
         this.debtorService = debtorService;
         this.collectorService = collectorService;
-        this.em = em;
     }
 
     public Page<Debt> findAll(DebtRequestFilter filter, Pageable pageable) {

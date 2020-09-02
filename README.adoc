@@ -23,7 +23,7 @@ O teste contém 2 módulos construídos com Spring Boot, se comunicando via troca d
 * SQL(h2)
 * NOSQL(Mongo)
 
-
+'''
 == Instalação e excução
 Guia rápido para instalação dos componentes e dependências para a execução do teste.
 
@@ -59,8 +59,9 @@ Após baixar as dependências o projeto está pronto para execução. Entre nas pasta
 ----
 
 
-Caso queria passar um ip diferente de `localhost` para a conexão com o RabbitMQ, usar o comando:
+TIP: Caso queria passar um ip diferente de `localhost` para a conexão com o RabbitMQ, usar o comando:
 
+Iniciar determinando um ip diferente para o RabbitMQ:
 
 [indent=0]
 ----
@@ -68,6 +69,7 @@ Caso queria passar um ip diferente de `localhost` para a conexão com o RabbitMQ,
 ----
 
 
+'''
 == Interagindo com os serviços
 
 Todas as rotas estão disponíveis via Swagger, em:
@@ -75,14 +77,22 @@ Todas as rotas estão disponíveis via Swagger, em:
 * Debts Service: http://localhost:8080/swagger-ui.html
 * Debt-Collector Service: http://localhost:8081/swagger-ui.html
 
-=== Dados
+=== Serviço para dívidas (Debts Service)
+
+O Debts Service é o serviço onde as dívidas são manipuladas. O serviço é construído com banco relacional, SQL, e está funcionando com um h2 em memória.
+
+É possível incluir, consultar, pagar e remover dívidas. Quando uma dívidas é inserida, é lançanado uma notificação de cobrança.
+
+IMPORTANT: As notificações são enviadas para o RabbitMQ, fila `debt.collector`
+
+==== Carga de dados
 
 Para desenvolver os serviços foram utilizados os seguintes para criar `debtors` e os `debts`.
 
-Para incluir o `debt` é necessário ter um `debtor` cadastrado.
+TIP: Os dados podem ser inseridos e consultados via *https://www.postman.com/[Postman]*.
 
-
-==== Criando os `debtors`
+'''
+===== *1 - Criando os `debtors`*
 
 Incluindo Fulano:
 
@@ -116,7 +126,10 @@ Incluindo Ciclano:
 	}
 ----
 
-==== Criando os `debts`
+'''
+===== *2 - Criando os `debts`*
+
+CAUTION: Para incluir o `debt` é necessário ter um `debtor` cadastrado.
 
 Incluindo dívida para Ciclano:
 
@@ -152,3 +165,98 @@ Incluindo dívida para Fulano e Ciclano:
 		]
 	}
 ----
+
+'''
+===== *3 - Consultando todos `debtors` e `debts` com filtro e paginação*
+
+Paginação: `page` e `size`
+
+Obter todos os devedores:
+
+[source,http,indent=0]
+----
+	GET /api/debtors HTTP/1.1
+----
+
+Filtros: `cpf`, `name`, `email` e `cellNumber`.
+
+Obter todos as as dívidas:
+
+[source,http,indent=0]
+----
+	GET /api/debtors HTTP/1.1
+----
+
+Filtros: `uuid`, `value`, `dueDate`, `status`(paid, unpaid) e `debtor`(id).
+
+Filtros de range: `value` com `maxValue` e `dueDate` com `endDueDate`.
+
+'''
+===== *4 - Consultando `debtors` e `debts` por `id`*
+
+Obter devedor:
+[source,http,indent=0]
+----
+	GET /api/debtors/{debtorId} HTTP/1.1
+----
+
+Obter dívidas:
+[source,http,indent=0]
+----
+	GET /api/debts/{debtId} HTTP/1.1
+----
+
+'''
+===== *5 - Obter todos os `debts` de um `debtor` com paginação e filtros*
+
+Obter todas dívidas de um devedor:
+[source,http,indent=0]
+----
+	GET /api/debtors/{debtorId}/debts HTTP/1.1
+----
+
+ou
+
+[source,http,indent=0]
+----
+	GET /api/debts?debtor={debtorId} HTTP/1.1
+----
+
+Paginação: `page` e `size`
+
+Filtros: `uuid`, `value`, `dueDate` e `status`(paid, unpaid).
+
+Filtros de range: `value` com `maxValue` e `dueDate` com `endDueDate`.
+
+'''
+===== *6 - Pagar um `debt`*
+
+Pagar uma dívida:
+
+[source,http,indent=0]
+----
+	PUT /api/debts/{debtId}/payoff HTTP/1.1
+----
+
+===== *6 - Remover um `debtor` ou um `debt`*
+
+Remover uma dívida:
+[source,http,indent=0]
+----
+	DELETE /api/debts/{debtId} HTTP/1.1
+----
+
+Remover um devedor:
+
+CAUTION: É possível remover apenas devedores sem dívidas
+
+[source,http,indent=0]
+----
+	DELETE /api/debtors/{debtorId} HTTP/1.1
+----
+
+=== Serviço para cobranças (Debts-Collector Service)
+
+O Debts-Collector é o serviço de cobrança, que atua enviando de mensagens aos respectivos responsáveis pela dívida, com finalidade de lembrar as datas de pegamento.
+
+Do ponto de vista técnico, o serviço Debts-Collector recebe notificações de cobrança lançadas pelo Debts, via RabbitMQ, faz o armazenamento no MongoDB. Antes de 10 e 1 dias da data de vencimento, dispara o envio dos lembretes de pagamentos. Esses lembretes podem ser enviados por `sms`, `email`, `telefonemas` ou `whatsapp`.
