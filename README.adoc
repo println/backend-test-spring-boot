@@ -363,7 +363,7 @@ Obter divida e devedores por `uuid`:
 
 A entrada de dados via eventos AMQP é o responsável por manupular os `debts`
 
-===== *1 - Recebe quando um `debt` é criado*
+===== *1 - Insere um `debt` quando recebe uma mensagem de criação de `debt` pelo Debts Service*
 
 [source,json,indent=0]
 ----
@@ -374,7 +374,7 @@ A entrada de dados via eventos AMQP é o responsável por manupular os `debts`
 ----
 
 '''
-===== *2 - Recebe quando um um `debt` é editado*
+===== *2 - Atualiza o `debt` quando recebe uma mensagem de modificação de `debt` pelo Debts Service*
 
 [source,json,indent=0]
 ----
@@ -385,7 +385,7 @@ A entrada de dados via eventos AMQP é o responsável por manupular os `debts`
 ----
 
 '''
-===== *3 - Recebe quando um um `debt` é pago ou deletado*
+===== *3 - Remove um `debt` quando recebe uma mensagem de deleção ou pagamento de `debt` pelo Debts Service*
 
 [source,json,indent=0]
 ----
