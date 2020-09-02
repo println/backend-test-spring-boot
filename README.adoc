@@ -286,8 +286,7 @@ As operações contém os seguintes estados:
 * `PUT`  - Débito atualizado
 * `DELETE` - Débito removido ou pago
 
-===== *1 - Criando um `debt`*
-Incluindo dívida:
+===== *1 - Ao criar um `debt`*
 
 [source,json,indent=0]
 ----
@@ -298,8 +297,7 @@ Incluindo dívida:
 ----
 
 '''
-===== *2 - Editando um `debt`*
-Pagando um dívida:
+===== *2 - Ao editar um `debt`*
 
 [source,json,indent=0]
 ----
@@ -310,8 +308,7 @@ Pagando um dívida:
 ----
 
 '''
-===== *2 - Deletando um `debt`*
-Removendo um dívida:
+===== *3 - Ao Deletar ou pagar um `debt`*
 
 [source,json,indent=0]
 ----
