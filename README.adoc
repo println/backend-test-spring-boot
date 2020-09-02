@@ -270,6 +270,7 @@ Essas notificações vão em pacotes chamados `Message`, com a operação e o dado do
 {
     "operation": "POST",
     "data": {
+		"uuid": "5cdecd30-f273-439c-9638-923318fb91c5",
         "dueDate": "2020-09-22",
         "value": "605.00",
         "debtors": [        
@@ -385,7 +386,7 @@ A entrada de dados via eventos AMQP é o responsável por manupular os `debts`
 ----
 
 '''
-===== *3 - Remove um `debt` quando recebe uma mensagem de deleção ou pagamento de `debt` pelo Debts Service*
+===== *3 - Remove o `debt` quando recebe uma mensagem de deleção ou pagamento de `debt` pelo Debts Service*
 
 [source,json,indent=0]
 ----
