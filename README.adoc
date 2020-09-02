@@ -23,7 +23,7 @@ O teste contém 2 módulos construídos com Spring Boot, se comunicando via troca d
 * SQL(h2)
 * NOSQL(Mongo)
 
-'''
+
 == Instalação e excução
 Guia rápido para instalação dos componentes e dependências para a execução do teste.
 
@@ -69,13 +69,14 @@ Iniciar determinando um ip diferente para o RabbitMQ:
 ----
 
 
-'''
+
 == Interagindo com os serviços
 
 Todas as rotas estão disponíveis via Swagger, em:
 
 * Debts Service: http://localhost:8080/swagger-ui.html
 * Debt-Collector Service: http://localhost:8081/swagger-ui.html
+
 
 === Serviço para dívidas (Debts Service)
 
@@ -91,7 +92,7 @@ Para desenvolver os serviços foram utilizados os seguintes para criar `debtors` 
 
 TIP: Os dados podem ser inseridos e consultados via *https://www.postman.com/[Postman]*.
 
-'''
+
 ===== *1 - Criando os `debtors`*
 
 Incluindo Fulano:
@@ -189,7 +190,7 @@ Obter todos as as dívidas:
 
 Filtros: `uuid`, `value`, `dueDate`, `status`(paid, unpaid) e `debtor`(id).
 
-Filtros de range: `value` com `maxValue` e `dueDate` com `endDueDate`.
+Filtros de range (inclusivo): `value` com `maxValue` e `dueDate` com `endDueDate`.
 
 '''
 ===== *4 - Consultando `debtors` e `debts` por `id`*
@@ -226,7 +227,7 @@ Paginação: `page` e `size`
 
 Filtros: `uuid`, `value`, `dueDate` e `status`(paid, unpaid).
 
-Filtros de range: `value` com `maxValue` e `dueDate` com `endDueDate`.
+Filtros de range (inclusivo): `value` com `maxValue` e `dueDate` com `endDueDate`.
 
 '''
 ===== *6 - Pagar um `debt`*
@@ -255,8 +256,14 @@ CAUTION: É possível remover apenas devedores sem dívidas
 	DELETE /api/debtors/{debtorId} HTTP/1.1
 ----
 
+
+
 === Serviço para cobranças (Debts-Collector Service)
 
-O Debts-Collector é o serviço de cobrança, que atua enviando de mensagens aos respectivos responsáveis pela dívida, com finalidade de lembrar as datas de pegamento.
+O Debts-Collector é o serviço de cobrança que atua enviando mensagens aos respectivos devedores, com finalidade de lembrar as datas de pegamento.
 
-Do ponto de vista técnico, o serviço Debts-Collector recebe notificações de cobrança lançadas pelo Debts, via RabbitMQ, faz o armazenamento no MongoDB. Antes de 10 e 1 dias da data de vencimento, dispara o envio dos lembretes de pagamentos. Esses lembretes podem ser enviados por `sms`, `email`, `telefonemas` ou `whatsapp`.
+Do ponto de vista técnico, o serviço Debts-Collector recebe notificações de cobrança lançadas pelo Debts, via RabbitMQ, faz o armazenamento no MongoDB.
+
+NOTE: As notificações são recebidas da fila `debt.collector`
+
+Nas datas de 10 dias e 1 dia  antes da data de vencimento, é disparado o envio dos lembretes de pagamentos por `sms`, `email`, `telefonemas` ou `whatsapp`.
