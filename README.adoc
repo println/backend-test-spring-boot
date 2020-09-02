@@ -239,7 +239,8 @@ Pagar uma dívida:
 	PUT /api/debts/{debtId}/payoff HTTP/1.1
 ----
 
-===== *6 - Remover um `debtor` ou um `debt`*
+'''
+===== *7 - Remover um `debtor` ou um `debt`*
 
 Remover uma dívida:
 [source,http,indent=0]
