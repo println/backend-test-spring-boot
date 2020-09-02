@@ -330,6 +330,90 @@ NOTE: As notificações são recebidas da fila `debt.collector`
 
 As mensagens são lançadas nas datas de 10 dias antes e 1 dia antes da data de vencimento e podem serem enviadas por: `sms`, `email`, `telefonemas` ou `whatsapp`.
 
+==== Dados via WEB
+
+NOTE: A inclusão de `debts` para o envio de mensagens de cobrança se dá via RabbitMQ
+
+===== *1 - Consultando todos `debts` e `debtors` com filtro e paginação*
+
+Obter todos as as dívidas:
+
+[source,http,indent=0]
+----
+	GET /api/debts HTTP/1.1
+----
+Paginação: `page` e `size`
+
+Filtros: `value`, `dueDate` e `debtor`(nome).
+
+Filtros de range (inclusivo): `value` com `maxValue` e `dueDate` com `endDueDate`.
+
+'''
+===== *2 - Consultando `debtors` e `debts` por `id`*
+
+Obter divida e devedores por `uuid`:
+
+[source,http,indent=0]
+----
+	GET /api/debts/{uuid} HTTP/1.1
+----
+
+
 ==== Dados via AMQP
 
-==== Dados via WEB
+A entrada de dados via eventos AMQP é o responsável por manupular os `debts`
+
+===== *1 - Recebe quando um `debt` é criado*
+
+[source,json,indent=0]
+----
+{
+    "operation": "POST",
+    "data": {...}
+}
+----
+
+'''
+===== *2 - Recebe quando um um `debt` é editado*
+
+[source,json,indent=0]
+----
+{
+    "operation": "PUT",
+    "data": {...}
+}
+----
+
+'''
+===== *3 - Recebe quando um um `debt` é pago ou deletado*
+
+[source,json,indent=0]
+----
+{
+    "operation": "DELETE",
+    "data": {...}
+}
+----
+
+== Informações adicionais
+
+Algumas informações adicionais.
+
+=== Testes 
+
+A ideia dos testes é manter o contrato mais consistente possível.
+
+Para isso foram feitos testes de sistema usando todas as urls disponíveis.
+
+Também foram feitos teste sobre das validações dos dados e os dados enviados e recebidos via AMQP.
+
+=== CRON
+
+A ideia é rodar o envio de mensagens com a seguinte regra cron:
+
+[source,cron,indent=0]
+----
+	0 1 1 * * MON-FRI
+----
+
+O evento de envio deve rodar todos os dias úteis, 1:10 da manhã.
